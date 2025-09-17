@@ -11,11 +11,10 @@ class ChatForm(forms.ModelForm):
         model = Chat
         fields = ('message', )
 
-class BookForm(forms.ModelForm):
+class Book(forms.ModelForm):
     class Meta:
         model = Book
-        fields = ('title', 'author', 'publisher', 'year', 'uploaded_by', 'desc')        
-
+        fields = ('title', 'author', 'publisher', 'year', 'uploaded_by', 'desc',"nbr_copy")        
 
 class UserForm(forms.ModelForm):
     class Meta:

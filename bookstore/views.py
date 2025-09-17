@@ -1,9 +1,9 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render,get_object_or_404
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from django.views import generic
 from bootstrap_modal_forms.mixins import PassRequestMixin
-from .models import User, Book, Chat, DeleteRequest, Feedback
+from .models import User, Book, Chat, DeleteRequest, Feedback,Emprunt
 from django.contrib import messages
 from django.db.models import Sum
 from django.views.generic import CreateView, DetailView, DeleteView, UpdateView, ListView
@@ -17,7 +17,8 @@ from django.contrib import auth
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
-from django.utils import timezone
+from django.utils import timezone 
+from datetime import timedelta
 
 
 # Shared Views
@@ -170,7 +171,7 @@ class UBookListView(LoginRequiredMixin, ListView):
 	model = Book
 	template_name = 'member/book_list.html'
 	context_object_name = 'books'
-	paginate_by = 2
+	paginate_by = 3
 
 	def get_queryset(self):
 		return Book.objects.order_by('-id')
@@ -515,6 +516,7 @@ def aabook(request):
         desc = request.POST['desc']
         cover = request.FILES['cover']
         pdf = request.FILES['pdf']
+        nbr_copy = request.POST['nbr_copy']
         current_user = request.user
         user_id = current_user.id
         username = current_user.username
@@ -540,9 +542,6 @@ class ABookListView(LoginRequiredMixin,ListView):
 	def get_queryset(self):
 		return Book.objects.order_by('-id')
 
-
-
-
 class AManageBook(LoginRequiredMixin,ListView):
 	model = Book
 	template_name = 'dashboard/manage_books.html'
@@ -551,8 +550,6 @@ class AManageBook(LoginRequiredMixin,ListView):
 
 	def get_queryset(self):
 		return Book.objects.order_by('-id')
-
-
 
 
 class ADeleteBook(LoginRequiredMixin,DeleteView):
@@ -573,18 +570,12 @@ class AViewBook(LoginRequiredMixin,DetailView):
 	model = Book
 	template_name = 'dashboard/book_detail.html'
 
-
-
-
 class AEditView(LoginRequiredMixin,UpdateView):
 	model = Book
 	form_class = BookForm
 	template_name = 'dashboard/edit_book.html'
 	success_url = reverse_lazy('ambook')
 	success_message = 'Data was updated successfully'
-
-
-
 
 class ADeleteRequest(LoginRequiredMixin,ListView):
 	model = DeleteRequest
@@ -656,3 +647,101 @@ def asearch(request):
         if files:
             return render(request, 'dashboard/result.html', {'files': files, 'word': word})
         return render(request, 'dashboard/result.html', {'files': files, 'word': word})
+
+@login_required
+def addEmprunt(request, id): 
+    # Récupérer le livre ou renvoyer 404
+    book = get_object_or_404(Book, id=id)
+    current_user = request.user
+
+    if book.nbr_copy > 0:
+        # Définir une date prévue de dépôt (exemple : 14 jours après l'emprunt)
+        date_prevu_depos = timezone.now() + timedelta(days=14)
+
+        # Créer l'emprunt
+        emprunt = Emprunt.objects.create(
+            book=book,                # objet Book
+            user=current_user,        # objet User
+            date_prevu_depos=date_prevu_depos,
+            amande_amount=0,
+            amande_paid_amount=0
+        )
+
+        # Diminuer le nombre de copies disponibles
+        book.nbr_copy -= 1
+        book.save()
+
+        messages.success(request, 'Livre emprunté avec succès.')
+        return redirect('albook')
+    else:
+        messages.error(request, 'Ce livre n’est pas disponible pour le moment.')
+        return redirect('aabook_form')
+
+
+@login_required
+def returnEmprunt(request, emprunt_id):
+    # Récupérer l'emprunt
+    emprunt = get_object_or_404(Emprunt, id=emprunt_id)
+
+    if emprunt.date_depos is None:
+        now = timezone.now()
+
+        # Vérifier le délai (date prévue + 1 jour)
+        limite = emprunt.date_prevu_depos + timedelta(days=1)
+        if now > limite:
+            emprunt.amande_amount = 500  # appliquer l'amende
+            messages.warning(request, f'Vous avez dépassé le délai ! Une amende de 500 a été appliquée.')
+
+        # Enregistrer la date de dépôt
+        emprunt.date_depos = now
+        emprunt.save()
+
+        # Remettre la copie du livre disponible
+        book = emprunt.book_id
+        book.nbr_copy += 1
+        book.save()
+
+        messages.success(request, f'Le livre "{book}" a été remis avec succès.')
+    else:
+        messages.warning(request, f'Le livre "{emprunt.book_id}" a déjà été remis.')
+
+    return redirect('albook')
+
+
+@login_required
+def total_emprunts(request): 
+    nombre_emprunts = Emprunt.objects.filter(date_depos__isnull=True).count()
+    context = {
+        'nombre_emprunts': nombre_emprunts
+    }
+    return render(request, 'dashboard/total_emprunts.html', context)
+
+@login_required
+def emprunts_utilisateur(request, user_id):
+    # Compter les emprunts en cours pour cet utilisateur
+    nombre_emprunts_user = Emprunt.objects.filter(user_id=user_id, date_depos__isnull=True).count()
+    context = {
+        'nombre_emprunts_user': nombre_emprunts_user
+    }
+    return render(request, 'member/base.html', context)
+
+@login_required
+def livres_retard(request):
+    maintenant = timezone.now()
+    montant_amande_par_jour = 500
+      
+    # Tous les emprunts en retard
+    emprunts_en_retard = Emprunt.objects.filter(
+        date_depos__isnull=True,
+        date_prevu_depos__lt=maintenant
+    ).select_related('book_id', 'user')
+
+    # Ajouter le calcul de l'amende pour chaque emprunt
+    for emprunt in emprunts_en_retard:
+        jours_retard = (maintenant - emprunt.date_prevu_depos).days
+        emprunt.amande_calculée = jours_retard * montant_amande_par_jour
+
+    context = {
+        'emprunts_en_retard': emprunts_en_retard
+    }
+    return render(request, 'dashboard/livres_retard.html', context)

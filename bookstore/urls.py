@@ -64,4 +64,20 @@ urlpatterns = [
  path('alvuser/<int:pk>', views.ALViewUser.as_view(), name='alvuser'),
  path('aeuser/<int:pk>', views.AEditUser.as_view(), name='aeuser'),
  path('aduser/<int:pk>', views.ADeleteUser.as_view(), name='aduser'), 
+ 
+# gestion des emprunts
+path('add-emprunt/<int:id>/', views.addEmprunt, name='add_emprunt'),
+
+# URL pour remettre un livre
+path('return-emprunt/<int:emprunt_id>/', views.returnEmprunt, name='return_emprunt'),
+
+# URL pour afficher le nombre total de livres empruntés
+path('total-emprunts/', views.total_emprunts, name='total_emprunts'),
+
+# URL pour afficher le nombre de livres empruntés par un utilisateur spécifique
+path('emprunts-user/<int:user_id>/', views.emprunts_utilisateur, name='emprunts_utilisateur'),
+
 ]
+
+
+

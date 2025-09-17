@@ -30,6 +30,7 @@ class Book(models.Model):
     user_id = models.CharField(max_length=100, null=True, blank=True)
     pdf = models.FileField(upload_to='bookapp/pdfs/')
     cover = models.ImageField(upload_to='bookapp/covers/', null=True, blank=True)
+    nbr_copy = models.IntegerField(max_length=100,null=True,default=0)
 
     def __str__(self):
         return self.title
@@ -39,21 +40,26 @@ class Book(models.Model):
         self.cover.delete()
         super().delete(*args, **kwargs)        
 
+class Emprunt():
+    book_id = models.ForeignKey(Book,on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date_prevu_depos = models.DateTimeField(auto_now_add=False, null=True)
+    date_depos = models.DateTimeField(auto_now_add=False, null=True)
+    date_save = models.DateTimeField(auto_now_add=True, null=False)
+    amande_amount = models.DecimalField(max_digits=8,decimal_places=2,null=True,default=0)
+    amande_paid_amount = models.DecimalField(max_digits=8,decimal_places=2,null=True,default=0)
 
 class Chat(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     message = models.TextField()
-    posted_at = models.DateTimeField(auto_now=True, null=True)
-
+    posted_at = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
         return str(self.message)
 
 
-
 class DeleteRequest(models.Model):
     delete_request = models.CharField(max_length=100, null=True, blank=True)
-
 
     def __str__(self):
         return self.delete_request
@@ -61,7 +67,6 @@ class DeleteRequest(models.Model):
 
 class Feedback(models.Model):
     feedback = models.CharField(max_length=100, null=True, blank=True)
-
 
     def __str__(self):
         return self.feedback
