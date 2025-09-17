@@ -1,65 +1,38 @@
 {% extends 'dashboard/base.html' %}
 
 {% block title %}
-
+Feedbacks
 {% endblock title %}
 
 {% block content %}
+<div class="container-fluid" style="margin-top: 30px;">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
 
-<div class="container-fluid">
-<div class="row">
-<div class="col-sm-3" style="color: red">
-  <p style="color: blue"></p>  
-</div>
+      <div class="card border-0">
+        <div class="card-body">
 
+          <h4 class="mb-4 text-center text-primary">
+            <i class="fas fa-comments"></i> User Feedback
+          </h4>
 
+          {% for feedback in feedbacks %}
+            <div class="p-3 mb-3 rounded" 
+                 style="background: #f8f9fa; border: 1px solid #ddd; font-size: 15px;">
+              <strong class="text-dark">
+                {{ feedback.feedback }}
+              </strong>
+            </div>
+          {% empty %}
+            <div class="alert alert-info text-center">
+              No feedback found.
+            </div>
+          {% endfor %}
 
-<div class="col-sm-6" style="padding-top: 25px">
-    <div class="card">
-</div>
+        </div>
+      </div>
 
-
-<div class="card mb-2">
-<div class="card-body">
-
-<div class="row">
-    <div class="col-sm-8">
-    {% for feedback in feedbacks %}
-
-
-        <div class="chat" style="width: 150%; background: white; box-shadow: 2px 0px 25px 20px #111;">
-                
-                <strong><small class="chat-user-special text-primary"> {{ feedback.feedback }}</small></strong>
-
-        </div><br><br><br>
-
-    {% empty %}
-    <h1 class="heading">No delete request</h1><br>
-
-    {% endfor %}
-
-    <div class="col-sm-4"></div>
     </div>
-
-
-                      </div>
-                    </div>  
-                  </div>
-
+  </div>
 </div>
-
-
-
-<div class="col-sm-2" style="color: red">
-</div>
-
-</div>
-</div>
-
-
 {% endblock content %}
-
-
-
-
-
