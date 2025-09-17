@@ -19,7 +19,6 @@ class User(AbstractUser):
     class Meta:
         swappable = 'AUTH_USER_MODEL'
 
-
 class Book(models.Model):
     title = models.CharField(max_length=100)
     author = models.CharField(max_length=100)
@@ -40,15 +39,18 @@ class Book(models.Model):
         self.cover.delete()
         super().delete(*args, **kwargs)        
 
-class Emprunt():
-    book_id = models.ForeignKey(Book,on_delete=models.CASCADE)
+class Emprunt(models.Model):   # <-- il faut hériter de models.Model !
+    book_id = models.ForeignKey(Book, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     date_prevu_depos = models.DateTimeField(auto_now_add=False, null=True)
     date_depos = models.DateTimeField(auto_now_add=False, null=True)
     date_save = models.DateTimeField(auto_now_add=True, null=False)
-    amande_amount = models.DecimalField(max_digits=8,decimal_places=2,null=True,default=0)
-    amande_paid_amount = models.DecimalField(max_digits=8,decimal_places=2,null=True,default=0)
+    amande_amount = models.DecimalField(max_digits=8, decimal_places=2, null=True, default=0)
+    amande_paid_amount = models.DecimalField(max_digits=8, decimal_places=2, null=True, default=0)
 
+    def __str__(self):
+        return f"{self.book_id} emprunté par {self.user}"
+    
 class Chat(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     message = models.TextField()

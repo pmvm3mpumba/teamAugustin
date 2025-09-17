@@ -6,15 +6,12 @@ class UserAdmin(admin.ModelAdmin):
     list_display = 'username', 'first_name', 'last_name', 'email', 'password'
     
 class BookAdmin(admin.ModelAdmin):
-    list_display = 'username', 'first_name', 'last_name', 'email', 'password'
+    list_display = 'title', 'author', 'publisher', 'year', 'uploaded_by', 'desc',"nbr_copy"
     
-class UserAdmin(admin.ModelAdmin):
-    list_display = 'username', 'first_name', 'last_name', 'email', 'password'
-    
-class UserAdmin(admin.ModelAdmin):
-    list_display = 'username', 'first_name', 'last_name', 'email', 'password'
-    
+class EmpruntAdmin(admin.ModelAdmin):
+    list_display = 'book_id', 'user', 'date_prevu_depos', 'date_depos', 'amande_amount', 'amande_paid_amount'
+     
 admin.site.register(User,UserAdmin)
-admin.site.register(Book,UserAdmin)
-admin.site.register(Emprunt,UserAdmin)
+admin.site.register(Book,BookAdmin)
+admin.site.register(Emprunt,EmpruntAdmin)
 
