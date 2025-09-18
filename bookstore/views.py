@@ -391,9 +391,7 @@ class LCreateChat(LoginRequiredMixin, CreateView):
 		self.object.save()
 		return super().form_valid(form)
 
-
-
-
+ 
 class LListChat(LoginRequiredMixin, ListView):
 	model = Chat
 	template_name = 'librarian/chat_list.html'
@@ -405,8 +403,9 @@ class LListChat(LoginRequiredMixin, ListView):
 def dashboard(request):
 	book = Book.objects.all().count()
 	user = User.objects.all().count()
-
-	context = {'book':book, 'user':user}
+	nombre_emprunts = Emprunt.objects.filter(date_depos__isnull=True).count() 
+	sommeEmprunt = montrantTotalEmprunte()
+	context = {'book':book, 'user':user, 'nombre_emprunts': nombre_emprunts,"sommeEmprunt":sommeEmprunt}
 
 	return render(request, 'dashboard/home.html', context)
 
@@ -506,6 +505,12 @@ class AListChat(LoginRequiredMixin, ListView):
 def aabook_form(request):
 	return render(request, 'dashboard/add_book.html')
 
+
+@login_required
+def empruntList(request):
+	return render(request, 'dashboard/emprunt_list.html')
+
+
 @login_required
 def aabook(request):
     if request.method == 'POST':
@@ -522,7 +527,7 @@ def aabook(request):
         username = current_user.username
 
         a = Book(
-            title=title, author=author, year=year, publisher=publisher,
+            title=title, author=author, year=year, publisher=publisher,nbr_copy=nbr_copy,
             desc=desc, cover=cover, pdf=pdf, uploaded_by=username, user_id=user_id
         )
         a.save()
@@ -586,8 +591,6 @@ class ADeleteRequest(LoginRequiredMixin,ListView):
 	def get_queryset(self):
 		return DeleteRequest.objects.order_by('-id')
 
-
-
 class AFeedback(LoginRequiredMixin,ListView):
 	model = Feedback
 	template_name = 'dashboard/feedback.html'
@@ -649,18 +652,19 @@ def asearch(request):
         return render(request, 'dashboard/result.html', {'files': files, 'word': word})
 
 @login_required
-def addEmprunt(request, id): 
+def addEmprunt(request): 
     # Récupérer le livre ou renvoyer 404
-    book = get_object_or_404(Book, id=id)
+    book_id = request.POST["book_id"]
+    book = Book.objects.get(id=book_id)
     current_user = request.user
 
     if book.nbr_copy > 0:
         # Définir une date prévue de dépôt (exemple : 14 jours après l'emprunt)
         date_prevu_depos = timezone.now() + timedelta(days=14)
-
+		 
         # Créer l'emprunt
         emprunt = Emprunt.objects.create(
-            book=book,                # objet Book
+            book_id=book,                # objet Book
             user=current_user,        # objet User
             date_prevu_depos=date_prevu_depos,
             amande_amount=0,
@@ -672,10 +676,10 @@ def addEmprunt(request, id):
         book.save()
 
         messages.success(request, 'Livre emprunté avec succès.')
-        return redirect('albook')
+        return redirect('member')
     else:
-        messages.error(request, 'Ce livre n’est pas disponible pour le moment.')
-        return redirect('aabook_form')
+        messages.error(request, f'Ce livre n’est pas disponible pour le moment. Tous les copy sont recupere {book.nbr_copy}')
+        return redirect('member')
 
 
 @login_required
@@ -731,17 +735,44 @@ def livres_retard(request):
     montant_amande_par_jour = 500
       
     # Tous les emprunts en retard
-    emprunts_en_retard = Emprunt.objects.filter(
-        date_depos__isnull=True,
-        date_prevu_depos__lt=maintenant
-    ).select_related('book_id', 'user')
+    emprunts_en_retard = Emprunt.objects.all(
+        #date_depos__isnull=True,
+        #date_prevu_depos__lt=maintenant
+    )
 
     # Ajouter le calcul de l'amende pour chaque emprunt
     for emprunt in emprunts_en_retard:
         jours_retard = (maintenant - emprunt.date_prevu_depos).days
-        emprunt.amande_calculée = jours_retard * montant_amande_par_jour
+        emprunt.amande_calcul = jours_retard * montant_amande_par_jour
 
     context = {
         'emprunts_en_retard': emprunts_en_retard
     }
-    return render(request, 'dashboard/livres_retard.html', context)
+    return render(request, 'dashboard/retar_livre_list.html', context)
+
+# class ListUserView(generic.ListView):
+#     model = User
+#     template_name = 'dashboard/list_users.html'
+#     context_object_name = 'users'
+#     paginate_by = 4
+
+#     def get_queryset(self):
+#         return User.objects.order_by('-id')
+
+
+def montrantTotalEmprunte() :
+    maintenant = timezone.now()
+    montant_amande_par_jour = 500 
+    totalAmande = 0  
+    
+    # Tous les emprunts en retard
+    emprunts_en_retard = Emprunt.objects.filter(
+        date_depos__isnull=True,
+        date_prevu_depos__lt=maintenant
+    ).select_related('book_id', 'user')
+    
+    # Ajouter le calcul de l'amende pour chaque emprunt
+    for emprunt in emprunts_en_retard:
+        jours_retard = (maintenant - emprunt.date_prevu_depos).days
+        totalAmande+= jours_retard * montant_amande_par_jour
+    return totalAmande

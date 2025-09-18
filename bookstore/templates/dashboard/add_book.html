@@ -39,10 +39,15 @@
                         <textarea class="form-control" name="desc" rows="3" placeholder="Short description..." required></textarea>
                     </div>
 
+                    <div class="form-group col-md-6">
+                        <label><i class=""></i> Nombre de copies</label>
+                        <input type="number"  class="form-control" name="nbr_copy" required>
+                    </div>
+
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label><i class="fas fa-image text-primary"></i> Choose Book Cover</label>
-                            <input type="file" class="form-control-file" name="cover" required>
+                            <input type="file"accept=".png,.jpg,.jpeg" class="form-control-file" name="cover" required>
                         </div>
                         <div class="form-group col-md-6">
                             <label><i class="fas fa-file-pdf text-danger"></i> Choose PDF Book</label>

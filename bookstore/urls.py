@@ -45,6 +45,7 @@ urlpatterns = [
 
  # Admin URL's
  path('dashboard/', views.dashboard, name='dashboard'),
+ path('retar_livre_list/', views.livres_retard, name='retar_livre_list'),
  path('acchat/', views.ACreateChat.as_view(), name='acchat'),
  path('alchat/', views.AListChat.as_view(), name='alchat'),
  path('aabook_form/', views.aabook_form, name='aabook_form'),
@@ -66,16 +67,16 @@ urlpatterns = [
  path('aduser/<int:pk>', views.ADeleteUser.as_view(), name='aduser'), 
  
 # gestion des emprunts
-path('add-emprunt/<int:id>/', views.addEmprunt, name='add_emprunt'),
+path('add_emprunt', views.addEmprunt, name='add_emprunt'),
 
 # URL pour remettre un livre
-path('return-emprunt/<int:emprunt_id>/', views.returnEmprunt, name='return_emprunt'),
+path('return_emprunt/<int:emprunt_id>/', views.returnEmprunt, name='return_emprunt'),
 
 # URL pour afficher le nombre total de livres empruntés
-path('total-emprunts/', views.total_emprunts, name='total_emprunts'),
+path('total_emprunts/', views.total_emprunts, name='total_emprunts'),
 
 # URL pour afficher le nombre de livres empruntés par un utilisateur spécifique
-path('emprunts-user/<int:user_id>/', views.emprunts_utilisateur, name='emprunts_utilisateur'),
+path('emprunts_user/<int:user_id>/', views.emprunts_utilisateur, name='emprunts_utilisateur'),
 
 ]
 

@@ -101,6 +101,7 @@
                                             <th>Book Title</th>
                                             <th>Read</th>
                                             <th>Download</th>
+                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -130,6 +131,13 @@
                                                     {% else %}
                                                         <span class="text-muted">No PDF</span>
                                                     {% endif %}
+                                                </td>
+                                                <td>  
+                                                    <form action="{% url 'add_emprunt' %}" method="post">
+                                                        {% csrf_token %}
+                                                        <input name="book_id" type="hidden" value="{{book.id}}"> 
+                                                        <input  type="submit" value="Emprunter">  
+                                                    </form>
                                                 </td>
                                             </tr>
                                             {% endfor %}

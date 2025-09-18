@@ -18,6 +18,8 @@ class User(AbstractUser):
 
     class Meta:
         swappable = 'AUTH_USER_MODEL'
+    def __str__(self):
+            return self.username+" ("+self.email+")"
 
 class Book(models.Model):
     title = models.CharField(max_length=100)
@@ -32,7 +34,7 @@ class Book(models.Model):
     nbr_copy = models.IntegerField(max_length=100,null=True,default=0)
 
     def __str__(self):
-        return self.title
+        return self.title+" (copies restant:"+str(self.nbr_copy)+")"
 
     def delete(self, *args, **kwargs):
         self.pdf.delete()
