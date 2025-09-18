@@ -1,162 +1,185 @@
 {% extends 'member/base.html' %}
 {% load static %}
 
-
 {% block body %}
+<div class="container-fluid" style="padding-top: 87px;">
+    <div class="row justify-content-center">
+        <div class="col-lg-12">
 
-
-<div class="container-fluid">
-<div class="row" style="padding-top: 87px">
-
-<div class="col-sm-1" style="color: red">
-</div>
-
-
-<div class="col-sm-10">
-                <div class="card mb-3">
-                <div class="card-header">
+            <!-- Dashboard Card -->
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-header bg-light">
                     <i class="fas fa-table text-primary"></i>
-                    Recent Added Books
+                    <strong>Dashboard</strong>
                 </div>
                 <div class="card-body">
-                   <ol class="breadcrumb">
-                <li class="breadcrumb-item">
-                    <a href="#"></a>
 
-                    <a  class="btn btn-sm btn-success" href="{% url 'uabook_form' %}" style="padding: 8px; float: right; background-color: green; color: white;">Add Book</a>
-                </li>
-            </ol>
+                    <!-- Breadcrumb -->
+                    <ol class="breadcrumb bg-white rounded">
+                        <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+                        <li class="breadcrumb-item active">Overview</li>
+                    </ol>
 
-             {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+                    <!-- Stat Cards -->
+                    <div class="row">
+
+                        <!-- Total Books -->
+                        <div class="col-xl-3 col-sm-6 mb-3">
+                            <div class="card text-white bg-success h-100 shadow-sm">
+                                <div class="card-body d-flex align-items-center">
+                                    <i class="fas fa-book fa-3x mr-3"></i>
+                                    <div>
+                                        <div class="h5 mb-0"><strong>Books</strong></div>
+                                        <div>393</div>
+                                    </div>
+                                </div>
+                                <a class="card-footer text-white small d-block text-center" href="#">Total Books</a>
+                            </div>
+                        </div>
+
+                        <!-- My Borrowed Books -->
+                        <div class="col-xl-3 col-sm-6 mb-3">
+                            <div class="card text-white bg-primary h-100 shadow-sm">
+                                <div class="card-body d-flex align-items-center">
+                                    <i class="fas fa-book-reader fa-3x mr-3"></i>
+                                    <div>
+                                        <div class="h5 mb-0"><strong>My Borrowed</strong></div>
+                                        <div>400</div>
+                                    </div>
+                                </div>
+                                <a class="card-footer text-white small d-block text-center" href="#">View Borrowed</a>
+                            </div>
+                        </div>
+
+                        <!-- Fines in Francs -->
+                        <div class="col-xl-3 col-sm-6 mb-3">
+                            <div class="card text-white bg-danger h-100 shadow-sm">
+                                <div class="card-body d-flex align-items-center">
+                                    <i class="fas fa-money-bill-wave fa-3x mr-3"></i>
+                                    <div>
+                                        <div class="h5 mb-0"><strong>Fines</strong></div>
+                                        <div>3000 FBU</div>
+                                    </div>
+                                </div>
+                                <a class="card-footer text-white small d-block text-center" href="#">View Fines</a>
+                            </div>
+                        </div>
+
+                        <!-- Search Books -->
+                        <div class="col-xl-3 col-sm-6 mb-3">
+                            <div class="card text-white bg-warning h-100 shadow-sm">
+                                <div class="card-body d-flex align-items-center">
+                                    <i class="fas fa-search fa-3x mr-3"></i>
+                                    <div>
+                                        <div class="h5 mb-0"><strong>Search Books</strong></div>
+                                        <div>Find your next read</div>
+                                    </div>
+                                </div>
+                                <a class="card-footer text-white small d-block text-center" href="">Go to Search</a>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <!-- Messages -->
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
                             {{ message }}
                         </div>
                     {% endfor %}
-            <div class="card mb-3">
 
-                <div class="card-body">
-                    <div class="table-responsive">
-<!-- Table --->
+                    <!-- Books Table -->
+                    <div class="card mt-4 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover table-striped" id="dataTable">
+                                    <thead class="bg-dark text-white">
+                                        <tr>
+                                            <th>Book ID</th>
+                                            <th>Book Cover</th>
+                                            <th>Book Title</th>
+                                            <th>Read</th>
+                                            <th>Download</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if books %}
+                                            {% for book in books %}
+                                            <tr>
+                                                <td>{{ book.id }}</td>
+                                                <td>
+                                                    {% if book.cover %}
+                                                        <img src="{{ book.cover.url }}" alt="{{ book.title }}" 
+                                                            style="height: 50px; width: 80px; border-radius: 2px; object-fit: cover;">
+                                                    {% else %}
+                                                        <span class="text-muted">No Cover</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ book.title }}</td>
+                                                <td>
+                                                    {% if book.pdf %}
+                                                        <a href="{{ book.pdf.url }}" class="btn btn-outline-primary btn-sm" target="_blank">View PDF</a>
+                                                    {% else %}
+                                                        <span class="text-muted">No PDF</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if book.pdf %}
+                                                        <a href="{{ book.pdf.url }}" download class="btn btn-outline-success btn-sm">Download PDF</a>
+                                                    {% else %}
+                                                        <span class="text-muted">No PDF</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
 
-
-                     
-                         <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                            <thead>
-                            <tr>
-                                <th>Book ID</th>
-                                <th>Book Cover</th>
-                                <th>Book Title</th>
-                                <th>Read</th>
-                                <th>Download</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-
-
-                           <!-- if and for -->
-                           {% if books %}
-                           {% for book in books %}
-
-                        
-                                <tr>
-                                  <td>{{ book.id }}</td>
-                                  <td>
-                                    {% if book.cover %}
-                                    <img src="{{ book.cover.url }}" alt="{{ book.title}}" style="height: 100px; width: 100px">
+                            <!-- Pagination -->
+                            {% if is_paginated %}
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination justify-content-center">
+                                    {% if page_obj.has_previous %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
+                                        </li>
                                     {% else %}
-                                    <span class="text-muted">No Cover</span>
+                                        <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
                                     {% endif %}
-                                   </td>
-                                  <td>{{ book.title }}</td>
-                                    <td>
-                                        {% if book.pdf %}
-                                    <a href="{{ book.pdf.url }}" class="btn btn-outline-primary" target="_blank">View PDF</a>
+
+                                    {% for i in paginator.page_range %}
+                                        {% if page_obj.number == i %}
+                                            <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                                        {% else %}
+                                            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    {% if page_obj.has_next %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a>
+                                        </li>
                                     {% else %}
-                                    <span class="text-muted">No PDF</span>
+                                        <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
                                     {% endif %}
-                                  </td>
-
-
-                                    <td>
-                                        {% if book.pdf %}
-                                    <a href="{{ book.pdf.url }}" download class="btn btn-outline-success">Download PDF</a>
-                                    {% else %}
-                                    <span class="text-muted">No PDF</span>
-                                    {% endif %}
-                                    
-                                  </td>
-                                  
-                                </tr>
-
-                                <!-- end for and if -->
-                                {% endfor %}
-                               {% endif %} 
-                            </tbody>
-                        </table>
-
-                          {% if is_paginated %}
-  <ul class="pagination">
-    {% if page_obj.has_previous %}
-      <li><a href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
-    {% else %}
-      <li class="disabled"><span>&laquo;</span></li>
-    {% endif %}
-    {% for i in paginator.page_range %}
-      {% if page_obj.number == i %}
-        <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
-      {% else %}
-        <li><a href="?page={{ i }}">{{ i }}</a></li>
-      {% endif %}
-    {% endfor %}
-    {% if page_obj.has_next %}
-      <li><a href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
-    {% else %}
-      <li class="disabled"><span>&raquo;</span></li>
-    {% endif %}
-  </ul>
-{% endif %}
-
-
-
-
-
-
-
-
-
+                                </ul>
+                            </nav>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
+
         </div>
-
-    </div>  
+    </div>
 </div>
 
-
-
-<div class="col-sm-1">
-</div>
-
-
-</div>
-
-    <script type="text/javascript" src="{% static 'js/jquery-2.1.3.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/bootstrap.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/jquery.dataTables.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/main.js' %}"></script>
-</body>
-
-</html>
+<!-- Scripts -->
+<script src="{% static 'js/jquery-2.1.3.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+<script src="{% static 'js/jquery.dataTables.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
 {% endblock %}
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,15 +1,14 @@
 {% load static %}
 
-<video loop muted autoplay playsinline class="video">
-  <source src="{% static 'css/back.mp4' %}" type="video/mp4" />
-</video>
+<!-- <video loop muted autoplay playsinline class="video">
+  <source src="{% static 'css/back.mp' %}" type="video/mp4" />
+</video> -->
 <!-- Custom styles for this template-->
     <link href="{% static 'bookstore/css/login.css' %}" rel="stylesheet">
     <link href="{% static 'bookstore/css/bootstrap/bootstrap.min.js' %}" rel="stylesheet">
     <link href="{% static 'bookstore/js/login.css' %}" rel="stylesheet">
     <link href="{% static 'vendor/datatables/dataTables.bootstrap4.css' %}" rel="stylesheet">
     <link href="{% static 'vendor/datatables/dataTables.bootstrap4.css' %}" rel="stylesheet">
-
 
     
 <head>
@@ -25,22 +24,17 @@
 <!------ Include the above in your HEAD tag ---------->
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
-    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+  <link href="{% static 'css/style.css' %}" rel="stylesheet">
 
 
 
 <div class="container">
-<br> 
-
-
-		 <h1 style="color: white" class="text-md-center"><span class="g"></span><span class="o"></span><span class="o1">BookApp</span> <span class="g"></span><span class="l"></span><span class="e"></span></h1>
-
 <div class="row">
 	<aside class="col-sm-4">
 	</aside> <!-- col.// -->
 
 	<aside class="col-sm-4">
-		<h1 style="color: yellow; font-weight: bold; font-size: 40px" class="text-md-center"><span class="g"></span><span class="o"></span><span class="o1"></span>BookApp<span class="g"></span><span class="l"></span><span class="e"></span></h1>
+		<h1 style="color: yellow; font-weight: bold; font-size: 40px" class="text-md-center"><span class="g"></span><span class="o"></span><span class="o1"></span><i class="fas fa-book"></i>WeebBookApp<span class="g"></span><span class="l"></span><span class="e"></span></h1>
 		<br>
 <div class="card">
 <article class="card-body" style="padding-top: 0px">
@@ -53,7 +47,7 @@
   <div class="d-flex justify-content-center h-100">
     <div class="card">
       <div class="card-header">
-        <center><h3>Login In Here</h3></center>
+        <center><h3>Login</h3></center>
         <div class="d-flex justify-content-end">
           <span><i class="fab fa-user"></i></span>
         </div>
@@ -91,7 +85,7 @@
                 {% endfor %}
             </div>
             {% endif %}
-              </div>
+        </div>
       </div>
     </div>
   </div>
